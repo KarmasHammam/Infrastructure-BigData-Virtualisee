@@ -1,0 +1,79 @@
+version: '3'
+
+services:
+  spark-master:
+    image: apache/spark:3.5.0
+    container_name: spark-master
+    hostname: spark-master
+    environment:
+      - SPARK_MODE=master
+      - SPARK_MASTER_HOST=spark-master
+      - SPARK_MASTER_PORT=7077
+      - SPARK_MASTER_WEBUI_PORT=8080
+    ports:
+      - "8080:8080"
+      - "7077:7077"
+    volumes:
+      - ./data:/data
+      - /mnt/shared-storage:/shared
+    networks:
+      - spark-network
+    command: /opt/spark/bin/spark-class org.apache.spark.deploy.master.Master
+
+  spark-worker-1:
+    image: apache/spark:3.5.0
+    container_name: spark-worker-1
+    hostname: spark-worker-1
+    depends_on:
+      - spark-master
+    environment:
+      - SPARK_MODE=worker
+      - SPARK_MASTER_URL=spark://spark-master:7077
+      - SPARK_WORKER_CORES=1
+      - SPARK_WORKER_MEMORY=1G
+    volumes:
+      - ./data:/data
+      - /mnt/shared-storage:/shared
+    networks:
+      - spark-network
+    command: /opt/spark/bin/spark-class org.apache.spark.deploy.worker.Worker spark://spark-master:7077
+
+  spark-worker-2:
+    image: apache/spark:3.5.0
+    container_name: spark-worker-2
+    hostname: spark-worker-2
+    depends_on:
+      - spark-master
+    environment:
+      - SPARK_MODE=worker
+      - SPARK_MASTER_URL=spark://spark-master:7077
+      - SPARK_WORKER_CORES=1
+      - SPARK_WORKER_MEMORY=1G
+    volumes:
+      - ./data:/data
+      - /mnt/shared-storage:/shared
+    networks:
+      - spark-network
+    command: /opt/spark/bin/spark-class org.apache.spark.deploy.worker.Worker spark://spark-master:7077
+
+  jupyter:
+    image: jupyter/pyspark-notebook:spark-3.5.0
+    container_name: jupyter-spark
+    hostname: jupyter
+    depends_on:
+      - spark-master
+    environment:
+      - JUPYTER_ENABLE_LAB=yes
+    ports:
+      - "8888:8888"
+    volumes:
+      - ./notebooks:/home/jovyan/work
+      - ./data:/data
+      - /mnt/shared-storage:/shared
+    networks:
+      - spark-network
+    command: start-notebook.sh --NotebookApp.token='' --NotebookApp.password=''
+
+networks:
+  spark-network:
+    driver: bridge

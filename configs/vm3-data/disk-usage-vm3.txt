@@ -1,0 +1,2 @@
+/dev/sda2        30G  3.6G   25G  13% /
+/dev/sdb1        20G   60K   19G   1% /mnt/nfs-shared

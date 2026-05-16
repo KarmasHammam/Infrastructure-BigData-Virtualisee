@@ -1,0 +1,26 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  external_labels:
+    cluster: 'spark-bigdata'
+    environment: 'dev'
+
+scrape_configs:
+  # Prometheus lui-même
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  # Métriques système VM (Node Exporter)
+  - job_name: 'node-exporter'
+    static_configs:
+      - targets: ['172.18.0.2:9100']
+        labels:
+          instance: 'vm2-app'
+
+  # Métriques containers Docker (cAdvisor)
+  - job_name: 'cadvisor'
+    static_configs:
+      - targets: ['172.18.0.3:8080']
+        labels:
+          instance: 'vm2-app'

@@ -1,0 +1,29 @@
+# Fichiers système
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Secrets (JAMAIS commit ces fichiers)
+*.pem
+*.key
+*password*
+secrets/
+
+# Fichiers volumineux
+*.iso
+*.vdi
+*.vmdk
+*.ova
+
+# Logs
+*.log
+
+# Fichiers temporaires LaTeX
+*.aux
+*.toc
+*.out
+*.synctex.gz
+
+# Cache
+.cache/
+__pycache__/
